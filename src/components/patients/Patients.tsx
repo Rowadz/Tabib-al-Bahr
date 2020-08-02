@@ -1,43 +1,32 @@
-import React, { useState } from 'react'
-import { AgGridReact } from 'ag-grid-react'
+import React, { useState, useEffect } from 'react'
+import { AgGridReact, AgGridColumn } from 'ag-grid-react'
 import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import { Grid, Row, Col, IconButton, Icon } from 'rsuite'
 import { Link } from 'react-router-dom'
+import * as firebase from 'firebase'
+import { Patient } from './patients.interface'
 
 export default function Patients() {
-  const [state] = useState({
+  const [state, setSate] = useState({
     columnDefs: [
       {
         headerName: 'اسم المريض',
-        field: 'make',
+        field: 'patient_name',
+        cellRendererFramework: ({ value, data }: any) => {
+          return <Link to={`/display/patients/${data.id}`}>{value}</Link>
+        },
       },
       {
         headerName: 'الجنس',
-        field: 'model',
+        field: 'patient_sex',
       },
       {
-        headerName: 'تاريخ اخر زياره',
-        field: 'price',
+        headerName: 'معلومـات إضافية',
+        field: 'patient_extra_info',
       },
     ],
-    rowData: [
-      {
-        make: 'محمد الرواد',
-        model: 'ذكر',
-        price: 35000,
-      },
-      {
-        make: 'سيف الرواد',
-        model: 'ذكر',
-        price: 32000,
-      },
-      {
-        make: 'زهره',
-        model: 'انثى',
-        price: 72000,
-      },
-    ],
+    rowData: [],
     defaultColDef: {
       editable: true,
       sortable: true,
@@ -47,6 +36,19 @@ export default function Patients() {
       resizable: true,
     },
   })
+  useEffect(() => {
+    const db = firebase.firestore()
+    const patients: Array<Patient> = []
+    db.collection('patients')
+      .get()
+      .then((data) => {
+        data.forEach((doc) => {
+          console.log(doc)
+          patients.push({ ...doc.data(), id: doc.id } as Patient)
+        })
+        setSate({ ...state, rowData: patients as any })
+      })
+  }, [])
   return (
     <Grid style={{ padding: 70 }}>
       <Row>

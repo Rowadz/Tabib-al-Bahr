@@ -20,11 +20,11 @@ export default function AppNav() {
               المـــرضى
             </Item>
           </NavLink>
-          <NavLink to="/doctors" activeClassName="active-route">
+          {/* <NavLink to="/doctors" activeClassName="active-route">
             <Item eventKey="3" icon={<Icon icon="user-md" />}>
               الأطبـــاء
             </Item>
-          </NavLink>
+          </NavLink> */}
         </Nav>
         <Nav pullRight>
           <NavLink to="/analytics" activeClassName="active-route">

@@ -5,17 +5,22 @@ import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { IntlProvider } from 'rsuite'
 import { IntlProviderProps } from 'rsuite/lib/IntlProvider'
+import { FirebaseAppProvider } from 'reactfire'
+
+const firebaseConfig = {}
 
 function RTL(props: IntlProviderProps) {
   return <IntlProvider rtl>{props.children}</IntlProvider>
 }
 
 ReactDOM.render(
-  <RTL>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </RTL>,
+  <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+    <RTL>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </RTL>
+  </FirebaseAppProvider>,
   document.getElementById('root')
 )
 
