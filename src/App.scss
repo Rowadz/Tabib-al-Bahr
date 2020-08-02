@@ -2,3 +2,8 @@ html,
 body {
   font-family: 'Tajawal', sans-serif !important;
 }
+
+.active-route a {
+  background-color: #ccc;
+  color: #406c75 !important;
+}

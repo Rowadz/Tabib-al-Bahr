@@ -1,14 +1,20 @@
 import React from 'react'
 import './App.scss'
-import { Button } from 'rsuite'
+import { HashRouter as Router, Route } from 'react-router-dom'
 import 'rsuite/dist/styles/rsuite-default-rtl.css'
-import { AppNav } from './components/landingPage'
+import { AppNav, Home } from './components'
 
 function App() {
   return (
-    <main>
+    <Router>
       <AppNav />
-    </main>
+      <Route path="/" exact={true}>
+        <Home />
+      </Route>
+      <Route path="/patients"></Route>
+      <Route path="/doctors"></Route>
+      <Route path="/analytics"></Route>
+    </Router>
   )
 }
 
