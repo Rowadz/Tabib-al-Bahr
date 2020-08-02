@@ -1,3 +1,5 @@
 import AppNav from './navigations/AppNav'
 import Home from './home/Home'
-export { AppNav, Home }
+import Patients from './patients/Patients'
+import AddPatients from './patients/AddPatients'
+export { AppNav, Home, Patients, AddPatients }
