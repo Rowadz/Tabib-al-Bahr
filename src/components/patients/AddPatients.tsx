@@ -20,7 +20,6 @@ import { useFirestore, useFirestoreDocData } from 'reactfire'
 import FroalaEditor from 'react-froala-wysiwyg'
 
 import { Alert } from 'rsuite'
-import { stat } from 'fs'
 
 export default function AddPatients() {
   const { id } = useParams()
@@ -144,9 +143,9 @@ export default function AddPatients() {
   }
 
   const submit = () => {
-    if (state.edit) {
+    if (!id) {
       setState({ ...state, loading: true })
-      const { redirect, userId, loading, ...data } = state
+      const { redirect, userId, loading, gloablLoading, edit, ...data } = state
       patients.add(data).then((user) => {
         Alert.success('تمت إضافة المريض بنجاح')
         setState({ ...state, loading: false, redirect: true, userId: user.id })
@@ -164,7 +163,6 @@ export default function AddPatients() {
     }
   }
   const { patient_sex, patient_name } = state
-  console.log(state)
   const page = state.redirect ? (
     <Redirect to={`/display/patients/${state.userId}`} />
   ) : (

@@ -110,7 +110,6 @@ export default function PatientProfile() {
         ...reset,
       })
     )
-  console.log(toDisplayDiagnoses)
 
   const toggle = () =>
     setState({
@@ -206,7 +205,6 @@ export default function PatientProfile() {
     const oldDiagnoses = ((await patient.get()).data() as any).diagnoses
     const diagnose = oldDiagnoses.find(({ uuid: id }: any) => uuid === id)
 
-    console.log(diagnose)
     setState({
       ...state,
       openModal: true,
@@ -246,7 +244,9 @@ export default function PatientProfile() {
             <FormGroup>
               <ControlLabel>تاريخ الزيـارة</ControlLabel>
               <DatePicker
-                value={state.edit ? (state.editDiagDate as any) : undefined}
+                value={
+                  state.edit ? (state.editDiagDate as any) : state.diagDate
+                }
                 disabled={state.globalLoading}
                 onChange={dateChage}
                 cleanable={false}
@@ -276,7 +276,7 @@ export default function PatientProfile() {
                 rows={5}
                 componentClass="textarea"
                 onChange={(complain_edit) =>
-                  setState({ ...state, complain_edit })
+                  setState({ ...state, complain_edit, complain: complain_edit })
                 }
                 value={state.edit ? state.complain_edit : state.complain}
               />
@@ -289,7 +289,11 @@ export default function PatientProfile() {
                 rows={5}
                 componentClass="textarea"
                 onChange={(diagnosis_txt_edit) =>
-                  setState({ ...state, diagnosis_txt_edit })
+                  setState({
+                    ...state,
+                    diagnosis_txt_edit,
+                    diagnosis_txt: diagnosis_txt_edit,
+                  })
                 }
                 value={
                   state.edit ? state.diagnosis_txt_edit : state.diagnosis_txt
@@ -304,7 +308,11 @@ export default function PatientProfile() {
                 rows={5}
                 componentClass="textarea"
                 onChange={(clinical_examination_edit) =>
-                  setState({ ...state, clinical_examination_edit })
+                  setState({
+                    ...state,
+                    clinical_examination_edit,
+                    clinical_examination: clinical_examination_edit,
+                  })
                 }
                 value={
                   state.edit
@@ -321,7 +329,11 @@ export default function PatientProfile() {
                 rows={5}
                 componentClass="textarea"
                 onChange={(laboratories_edit) =>
-                  setState({ ...state, laboratories_edit })
+                  setState({
+                    ...state,
+                    laboratories_edit,
+                    laboratories: laboratories_edit,
+                  })
                 }
                 value={
                   state.edit ? state.laboratories_edit : state.laboratories
@@ -335,7 +347,9 @@ export default function PatientProfile() {
                 name="x_rays"
                 rows={5}
                 componentClass="textarea"
-                onChange={(x_rays_edit) => setState({ ...state, x_rays_edit })}
+                onChange={(x_rays_edit) =>
+                  setState({ ...state, x_rays_edit, x_rays: x_rays_edit })
+                }
                 value={state.edit ? state.x_rays_edit : state.x_rays}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
@@ -347,9 +361,13 @@ export default function PatientProfile() {
                 rows={5}
                 componentClass="textarea"
                 onChange={(treatment_edit) =>
-                  setState({ ...state, treatment_edit })
+                  setState({
+                    ...state,
+                    treatment_edit,
+                    treatment: treatment_edit,
+                  })
                 }
-                value={state.edit ? state.treatment_edit : state.x_rays}
+                value={state.edit ? state.treatment_edit : state.treatment}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -520,7 +538,10 @@ export default function PatientProfile() {
                   <Icon icon="heart" /> العلاج: {treatment}
                   <br />
                   <Icon icon="plus-square" /> معلومات إضافية:{' '}
-                  <span dangerouslySetInnerHTML={{ __html: txt }}></span>
+                  <span
+                    dangerouslySetInnerHTML={{ __html: txt ? txt : '--' }}
+                  ></span>
+                  <br />
                   <Whisper placement="top" trigger="click" speaker={delSpeaker}>
                     <IconButton
                       icon={<Icon icon="trash" />}

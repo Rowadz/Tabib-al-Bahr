@@ -34,6 +34,7 @@
     "react-scripts": "3.4.1",
     "reactfire": "^2.0.3",
     "rsuite": "^4.8.0",
+    "ts-transformer-keys": "^0.4.2",
     "typescript": "^3.7.5",
     "uuid": "^8.3.0"
   },

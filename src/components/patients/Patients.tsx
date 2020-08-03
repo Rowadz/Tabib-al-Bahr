@@ -5,7 +5,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css'
 import { Grid, Row, Col, IconButton, Icon } from 'rsuite'
 import { Link } from 'react-router-dom'
 import * as firebase from 'firebase'
-import { Patient } from './patients.interface'
+import { Patient, keys } from './patients.interface'
 
 export default function Patients() {
   const [state, setSate] = useState({
@@ -21,10 +21,42 @@ export default function Patients() {
         headerName: 'الجنس',
         field: 'patient_sex',
       },
-      //   {
-      //     headerName: 'معلومـات إضافية',
-      //     field: 'patient_extra_info',
-      //   },
+      {
+        headerName: 'الرقم الوطني',
+        field: 'patient_ID',
+      },
+      {
+        headerName: 'المدينة',
+        field: 'patient_city',
+      },
+      {
+        headerName: 'معلومات إضافيه عن السكن',
+        field: 'patient_city_extra',
+      },
+      {
+        headerName: 'رقم الهاتف',
+        field: 'patient_phone',
+      },
+      {
+        headerName: 'السيره المرضية',
+        field: 'patient_disease_history',
+      },
+      {
+        headerName: 'المستوى الدراسي',
+        field: 'patient_educational_lvl',
+      },
+      {
+        headerName: 'التاريخ المرضي للعائلة',
+        field: 'patient_family_history',
+      },
+      {
+        headerName: 'تاريخ الأدويه',
+        field: 'patient_medicine_history',
+      },
+      {
+        headerName: 'تاريخ العمليات',
+        field: 'patient_surgery_history',
+      },
     ],
     rowData: [],
     defaultColDef: {
@@ -39,17 +71,19 @@ export default function Patients() {
   useEffect(() => {
     const db = firebase.firestore()
     const patients: Array<Patient> = []
+    const startObj = keys.reduce((prev, curr) => ({ ...prev, [curr]: '' }), {})
     db.collection('patients')
       .get()
       .then((data) => {
         data.forEach((doc) => {
-          patients.push({ ...doc.data(), id: doc.id } as Patient)
+          patients.push({ ...startObj, ...doc.data(), id: doc.id } as Patient)
         })
         setSate({ ...state, rowData: patients as any })
       })
   }, [])
+  console.log(state.rowData)
   return (
-    <Grid style={{ padding: 70 }}>
+    <Grid fluid style={{ marginTop: 10 }}>
       <Row>
         <Col xs={24} sm={24} md={24}>
           <Link to="/patients/add">
