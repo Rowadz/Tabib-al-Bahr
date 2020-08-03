@@ -26,13 +26,13 @@ export default function AppNav() {
             </Item>
           </NavLink> */}
         </Nav>
-        <Nav pullRight>
+        {/* <Nav pullRight>
           <NavLink to="/analytics" activeClassName="active-route">
             <Item eventKey="3" icon={<Icon icon="pie-chart" />}>
               إحصــائـــيات
             </Item>
           </NavLink>
-        </Nav>
+        </Nav> */}
       </Body>
     </Navbar>
   )

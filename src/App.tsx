@@ -2,7 +2,9 @@ import React from 'react'
 import './App.scss'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import 'rsuite/dist/styles/rsuite-default-rtl.css'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import 'froala-editor/css/froala_style.min.css'
+import 'froala-editor/css/froala_editor.pkgd.min.css'
+import 'froala-editor/js/plugins/font_size.min.js'
 import {
   AppNav,
   Home,

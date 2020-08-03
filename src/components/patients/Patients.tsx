@@ -21,10 +21,10 @@ export default function Patients() {
         headerName: 'الجنس',
         field: 'patient_sex',
       },
-      {
-        headerName: 'معلومـات إضافية',
-        field: 'patient_extra_info',
-      },
+      //   {
+      //     headerName: 'معلومـات إضافية',
+      //     field: 'patient_extra_info',
+      //   },
     ],
     rowData: [],
     defaultColDef: {

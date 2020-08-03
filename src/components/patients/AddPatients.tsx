@@ -15,6 +15,8 @@ import {
 } from 'rsuite'
 import { Redirect } from 'react-router-dom'
 import { useFirestore } from 'reactfire'
+import FroalaEditor from 'react-froala-wysiwyg'
+
 import { Alert } from 'rsuite'
 
 export default function AddPatients() {
@@ -29,9 +31,12 @@ export default function AddPatients() {
 
   const patients = useFirestore().collection('patients')
 
+  console.log(state)
   const { patient_sex, patient_name } = state
   const changeVal = (formValue: Record<string, any>) => {
-    setState({ ...state, ...formValue })
+    if (typeof formValue === 'string')
+      setState({ ...state, patient_extra_info: formValue })
+    else setState({ ...state, ...formValue })
   }
 
   const submit = () => {
@@ -64,10 +69,29 @@ export default function AddPatients() {
             </FormGroup>
             <FormGroup>
               <ControlLabel>معلومات إضافــية</ControlLabel>
-              <FormControl
-                rows={5}
-                name="patient_extra_info"
-                componentClass="textarea"
+              <FroalaEditor
+                tag="textarea"
+                config={{
+                  toolbarButtons: [
+                    'bold',
+                    'italic',
+                    'underline',
+                    'h1',
+                    'strikeThrough',
+                    'fontFamily',
+                    'fontSize',
+                    '|',
+                    'paragraphStyle',
+                    'paragraphFormat',
+                    'align',
+                    'undo',
+                    'redo',
+                    'html',
+                  ],
+                  charCounterCount: true,
+                  direction: 'rtl',
+                }}
+                onModelChange={changeVal}
               />
             </FormGroup>
             <FormGroup>

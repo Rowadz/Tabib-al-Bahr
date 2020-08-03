@@ -16,36 +16,43 @@ import {
   IconButton,
   Icon,
   Divider,
+  Timeline,
 } from 'rsuite'
-import { Editor } from 'react-draft-wysiwyg'
-import { EditorState, convertToRaw, ContentState } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
-import htmlToDraft from 'html-to-draftjs'
 
+import FroalaEditor from 'react-froala-wysiwyg'
+
+import moment from 'moment'
+// import 'moment/locale/ar'
+// moment.locale('ar')
 const { Header, Title, Body, Footer } = Modal
 
 export default function PatientProfile() {
-  const contentBlock = htmlToDraft('')
-  const contentState = ContentState.createFromBlockArray(
-    contentBlock.contentBlocks
-  )
-  const editorState = EditorState.createWithContent(contentState)
   const [state, setState] = useState({
     openModal: false,
     diagDate: undefined,
-    editorState,
+    txt: '',
   })
 
   const { id } = useParams()
   const patient = useFirestore().collection('patients').doc(id)
 
-  const { patient_name, patient_sex, patient_extra_info } = useFirestoreDocData(
-    patient
+  const {
+    patient_name,
+    patient_sex,
+    patient_extra_info,
+    diagnoses,
+  } = useFirestoreDocData(patient)
+  const toDisplayDiagnoses = (diagnoses || []).sort(
+    ({ diagDate: a }: any, { diagDate: b }: any) =>
+      +moment(a.toDate()).format('X') - +moment(b.toDate()).format('X')
   )
+
+  console.log(toDisplayDiagnoses)
+
   const toggle = () => setState({ ...state, openModal: !state.openModal })
   const addDiag = async () => {
     const newData = {
-      txt: JSON.stringify(state.editorState.getCurrentContent()),
+      txt: state.txt,
       diagDate: state.diagDate,
     }
     let oldDiagnoses = ((await patient.get()).data() as any).diagnoses
@@ -61,8 +68,8 @@ export default function PatientProfile() {
   ) => {
     setState({ ...state, diagDate: value as any })
   }
-  const txtChange = (editorState: any) => {
-    setState({ ...state, editorState })
+  const txtChange = (txt: any) => {
+    setState({ ...state, txt })
   }
 
   return (
@@ -100,47 +107,38 @@ export default function PatientProfile() {
             </FormGroup>
             <FormGroup>
               <ControlLabel>التشـــيخــص</ControlLabel>
-              <Editor
-                onEditorStateChange={txtChange}
-                editorStyle={{
-                  border: '1px solid #ccc',
-                  padding: 10,
-                  height: 200,
-                }}
-                editorState={state.editorState}
-                textAlignment="right"
-                toolbar={{
-                  options: [
-                    'inline',
-                    'blockType',
-                    'fontSize',
+              <FroalaEditor
+                tag="textarea"
+                config={{
+                  toolbarButtons: [
+                    'bold',
+                    'italic',
+                    'underline',
+                    'h1',
+                    'strikeThrough',
                     'fontFamily',
-                    'list',
-                    'textAlign',
-                    // 'colorPicker',
-                    // 'link',
-                    // 'embedded',
-                    // 'emoji',
-                    // 'image',
-                    // 'remove',
-                    'history',
+                    'fontSize',
+                    '|',
+                    'paragraphStyle',
+                    'paragraphFormat',
+                    'align',
+                    'undo',
+                    'redo',
+                    'html',
                   ],
-                  font: ['strikethrough', 'superscript', 'subscript'],
-                  color: ['color'],
-                  para: ['ul', 'ol', 'paragraph'],
-                  image: {
-                    alignmentEnabled: false,
-
-                    alt: { present: true, mandatory: false },
-                    previewImage: true,
-                  },
+                  direction: 'rtl',
                 }}
+                onModelChange={txtChange}
               />
             </FormGroup>
           </Form>
         </Body>
         <Footer>
-          <Button appearance="primary" onClick={addDiag}>
+          <Button
+            appearance="primary"
+            onClick={addDiag}
+            disabled={!(state.txt && state.diagDate)}
+          >
             إضافة
           </Button>
           <Button onClick={toggle} appearance="subtle">
@@ -150,11 +148,24 @@ export default function PatientProfile() {
       </Modal>
       <Row>
         <Col xs={24} sm={24} md={24} style={{ marginTop: 10 }}>
-          <Panel shaded bordered bodyFill style={{ display: 'inline-block' }}>
+          <Panel
+            shaded
+            bordered
+            bodyFill
+            style={{ display: 'inline-block', width: '100%' }}
+          >
             <Panel>
               <h4>الاسم: {patient_name}</h4>
               <h4>الجنس: {patient_sex}</h4>
-              <h5>معلومات اضافيه: {patient_extra_info}</h5>
+              <h5>
+                معلومات اضافيه:
+                <Divider />
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: patient_extra_info ? patient_extra_info : 'لا يوجد',
+                  }}
+                ></span>
+              </h5>
             </Panel>
           </Panel>
         </Col>
@@ -165,6 +176,32 @@ export default function PatientProfile() {
           <IconButton icon={<Icon icon="plus" />} color="cyan" onClick={toggle}>
             إضافــه زياره و تشخيــص
           </IconButton>
+        </Col>
+        <Col xs={24} sm={24} md={24}>
+          <Divider>الزيــارات و التخشــيصــات</Divider>
+        </Col>
+        <Col xs={24} sm={24} md={24}>
+          <Timeline>
+            {toDisplayDiagnoses.map(({ diagDate, txt }: any, i: number) => (
+              <Timeline.Item key={i}>
+                {moment(diagDate.toDate()).format('MM/DD/YYYY')}
+                <span dangerouslySetInnerHTML={{ __html: txt }}></span>
+                <IconButton
+                  icon={<Icon icon="trash" />}
+                  color="red"
+                  circle
+                  size="xs"
+                />
+                <IconButton
+                  style={{ margin: 10 }}
+                  icon={<Icon icon="edit" />}
+                  color="cyan"
+                  circle
+                  size="xs"
+                />
+              </Timeline.Item>
+            ))}
+          </Timeline>
         </Col>
       </Row>
     </Grid>
