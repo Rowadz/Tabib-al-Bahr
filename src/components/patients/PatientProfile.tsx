@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { useFirestoreDocData, useFirestore, checkOptions } from 'reactfire'
+import { useParams, Redirect } from 'react-router-dom'
+import { useFirestoreDocData, useFirestore } from 'reactfire'
 import {
   Grid,
   Row,
@@ -26,7 +26,6 @@ import {
 } from 'rsuite'
 import { v4 } from 'uuid'
 import FroalaEditor from 'react-froala-wysiwyg'
-
 import moment from 'moment'
 // import 'moment/locale/ar'
 // moment.locale('ar')
@@ -55,6 +54,7 @@ export default function PatientProfile() {
     x_rays_edit: '',
     treatment: '',
     treatment_edit: '',
+    redirectToEdit: false,
   })
 
   const { id } = useParams()
@@ -230,7 +230,7 @@ export default function PatientProfile() {
     </Popover>
   )
 
-  console.log(state)
+  if (state.redirectToEdit) return <Redirect to={`/patients/add/${id}`} />
   return (
     <Grid style={{ padding: 70 }}>
       <Modal full show={state.openModal} onHide={toggle}>
@@ -474,6 +474,14 @@ export default function PatientProfile() {
         <Col xs={24} sm={24} md={24}>
           <IconButton icon={<Icon icon="plus" />} color="cyan" onClick={toggle}>
             إضافــه زياره و تشخيــص
+          </IconButton>
+          <IconButton
+            icon={<Icon icon="edit" />}
+            color="orange"
+            onClick={() => setState({ ...state, redirectToEdit: true })}
+            style={{ marginRight: 10 }}
+          >
+            تعديل بيانات المريض
           </IconButton>
         </Col>
         <Col xs={24} sm={24} md={24}>

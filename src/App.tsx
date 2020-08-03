@@ -28,6 +28,9 @@ function App() {
         <Route path="/patients/add" exact={true}>
           <AddPatients />
         </Route>
+        <Route path="/patients/add/:id" exact={true}>
+          <AddPatients />
+        </Route>
         <Route path="/display/patients/:id" exact={true}>
           <PatientProfile />
         </Route>

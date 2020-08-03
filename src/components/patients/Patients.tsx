@@ -43,7 +43,6 @@ export default function Patients() {
       .get()
       .then((data) => {
         data.forEach((doc) => {
-          console.log(doc)
           patients.push({ ...doc.data(), id: doc.id } as Patient)
         })
         setSate({ ...state, rowData: patients as any })

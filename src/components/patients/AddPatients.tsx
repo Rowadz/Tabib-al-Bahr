@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Grid,
   Row,
@@ -15,13 +15,15 @@ import {
   SelectPicker,
   DatePicker,
 } from 'rsuite'
-import { Redirect } from 'react-router-dom'
-import { useFirestore } from 'reactfire'
+import { Redirect, useParams } from 'react-router-dom'
+import { useFirestore, useFirestoreDocData } from 'reactfire'
 import FroalaEditor from 'react-froala-wysiwyg'
 
 import { Alert } from 'rsuite'
+import { stat } from 'fs'
 
 export default function AddPatients() {
+  const { id } = useParams()
   const city = [
     {
       label: 'عمان',
@@ -71,10 +73,6 @@ export default function AddPatients() {
       label: 'مادبا',
       value: 'مادبا',
     },
-    {
-      label: 'المفرق',
-      value: 'المفرق',
-    },
   ]
   const [state, setState] = useState({
     patient_name: '',
@@ -83,7 +81,8 @@ export default function AddPatients() {
     loading: false,
     redirect: false,
     userId: '',
-    birth_of_date: '',
+    patient_ID: '',
+    birth_of_date: new Date(),
     patient_city: '',
     patient_city_extra: '',
     patient_phone: '',
@@ -92,46 +91,105 @@ export default function AddPatients() {
     patient_surgery_history: '',
     patient_educational_lvl: '',
     patient_family_history: '',
+    edit: !!id,
+    gloablLoading: !!id,
   })
 
   const patients = useFirestore().collection('patients')
+  useEffect(() => {
+    if (id) {
+      patients
+        .doc(id)
+        .get()
+        .then((doc) => {
+          const {
+            patient_name,
+            patient_sex,
+            patient_extra_info,
+            patient_ID,
+            birth_of_date,
+            patient_city,
+            patient_city_extra,
+            patient_phone,
+            patient_disease_history,
+            patient_medicine_history,
+            patient_surgery_history,
+            patient_educational_lvl,
+            patient_family_history,
+          } = doc.data() as any
+          setState({
+            ...state,
+            patient_name,
+            patient_sex,
+            patient_extra_info,
+            patient_ID,
+            birth_of_date,
+            patient_city,
+            patient_city_extra,
+            patient_phone,
+            patient_disease_history,
+            patient_medicine_history,
+            patient_surgery_history,
+            patient_educational_lvl,
+            patient_family_history,
+          })
+        })
+    }
+  }, [])
 
-  const { patient_sex, patient_name } = state
   const changeVal = (formValue: Record<string, any>) => {
     if (typeof formValue === 'string')
       setState({ ...state, patient_extra_info: formValue })
     else setState({ ...state, ...formValue })
   }
 
-  const dateChage = (value: Date) => {
-    setState({ ...state, birth_of_date: value as any })
-  }
-
   const submit = () => {
-    setState({ ...state, loading: true })
-    const { redirect, userId, loading, ...data } = state
-    patients.add(data).then((user) => {
-      Alert.success('تمت إضافة المريض بنجاح')
-      setState({ ...state, loading: false, redirect: true, userId: user.id })
-    })
+    if (state.edit) {
+      setState({ ...state, loading: true })
+      const { redirect, userId, loading, ...data } = state
+      patients.add(data).then((user) => {
+        Alert.success('تمت إضافة المريض بنجاح')
+        setState({ ...state, loading: false, redirect: true, userId: user.id })
+      })
+    } else {
+      setState({ ...state, loading: true })
+      const { redirect, userId, loading, ...data } = state
+      patients
+        .doc(id)
+        .update({ ...data })
+        .then(() => {
+          Alert.success('تم التعديل بنجاح')
+          setState({ ...state, loading: false, redirect: true, userId: id })
+        })
+    }
   }
-
+  const { patient_sex, patient_name } = state
+  console.log(state)
   const page = state.redirect ? (
     <Redirect to={`/display/patients/${state.userId}`} />
   ) : (
     <Grid style={{ padding: 70 }}>
       <Row>
         <Col xs={24} sm={24} md={24}>
-          <Form onChange={changeVal}>
+          <Form>
             <FormGroup>
               <ControlLabel>اســم المريــض الكامل</ControlLabel>
-              <FormControl name="patient_name" />
+              <FormControl
+                name="patient_name"
+                onChange={(s) => setState({ ...state, patient_name: s })}
+                value={state.patient_name}
+              />
               <HelpBlock>لا يمكن تخزين المعلومات بدون هذه المعلومة</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>جنـس المريــض</ControlLabel>
               <HelpBlock>لا يمكن تخزين المعلومات بدون هذه المعلومة</HelpBlock>
-              <FormControl name="patient_sex" accepter={RadioGroup}>
+              <FormControl
+                name="patient_sex"
+                accepter={RadioGroup}
+                value={state.patient_sex}
+                onChange={(val) => setState({ ...state, patient_sex: val })}
+              >
                 <Radio value="ذكـــر">ذكـــر</Radio>
                 <Radio value="أنثـــى">أنثـــى</Radio>
               </FormControl>
@@ -145,29 +203,49 @@ export default function AddPatients() {
                 onChange={(patient_city) =>
                   setState({ ...state, patient_city })
                 }
+                value={state.patient_city}
                 name="patient_city"
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>معلومات إضافيه عن السكن</ControlLabel>
-              <FormControl name="patient_city_extra" />
+              <FormControl
+                name="patient_city_extra"
+                onChange={(patient_city_extra) =>
+                  setState({ ...state, patient_city_extra })
+                }
+                value={state.patient_city_extra}
+              />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>رقم الهاتف</ControlLabel>
-              <FormControl name="patient_phone" />
+              <FormControl
+                name="patient_phone"
+                onChange={(patient_phone) =>
+                  setState({ ...state, patient_phone })
+                }
+                value={state.patient_phone}
+              />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>الرقم الوطني</ControlLabel>
-              <FormControl name="patient_ID" />
+              <FormControl
+                name="patient_ID"
+                onChange={(patient_ID) => setState({ ...state, patient_ID })}
+                value={state.patient_ID}
+              />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>تاريخ الميلاد</ControlLabel>
               <DatePicker
-                onChange={dateChage}
+                onChange={(birth_of_date: Date) =>
+                  setState({ ...state, birth_of_date: birth_of_date as any })
+                }
+                defaultValue={state.birth_of_date}
                 cleanable={false}
                 locale={{
                   sunday: 'Su',
@@ -195,6 +273,10 @@ export default function AddPatients() {
                 name="patient_disease_history"
                 rows={5}
                 componentClass="textarea"
+                onChange={(patient_disease_history) =>
+                  setState({ ...state, patient_disease_history })
+                }
+                value={state.patient_disease_history}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -204,6 +286,10 @@ export default function AddPatients() {
                 name="patient_medicine_history"
                 rows={5}
                 componentClass="textarea"
+                onChange={(patient_medicine_history) =>
+                  setState({ ...state, patient_medicine_history })
+                }
+                value={state.patient_medicine_history}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -213,6 +299,10 @@ export default function AddPatients() {
                 name="patient_surgery_history"
                 rows={5}
                 componentClass="textarea"
+                onChange={(patient_surgery_history) =>
+                  setState({ ...state, patient_surgery_history })
+                }
+                value={state.patient_surgery_history}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -222,6 +312,10 @@ export default function AddPatients() {
                 name="patient_educational_lvl"
                 rows={5}
                 componentClass="textarea"
+                onChange={(patient_educational_lvl) =>
+                  setState({ ...state, patient_educational_lvl })
+                }
+                value={state.patient_educational_lvl}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -231,6 +325,10 @@ export default function AddPatients() {
                 name="patient_family_history"
                 rows={5}
                 componentClass="textarea"
+                onChange={(patient_family_history) =>
+                  setState({ ...state, patient_family_history })
+                }
+                value={state.patient_family_history}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -263,14 +361,26 @@ export default function AddPatients() {
             </FormGroup>
             <FormGroup>
               <ButtonToolbar>
-                <Button
-                  appearance="primary"
-                  disabled={!(patient_sex && patient_name)}
-                  onClick={submit}
-                  loading={state.loading}
-                >
-                  إضافـــة
-                </Button>
+                {state.edit ? (
+                  <Button
+                    appearance="primary"
+                    color="orange"
+                    disabled={!(patient_sex && patient_name)}
+                    onClick={submit}
+                    loading={state.loading}
+                  >
+                    تعديل
+                  </Button>
+                ) : (
+                  <Button
+                    appearance="primary"
+                    disabled={!(patient_sex && patient_name)}
+                    onClick={submit}
+                    loading={state.loading}
+                  >
+                    إضافـــة
+                  </Button>
+                )}
                 <HelpBlock>
                   بعد إضافة المريض او المريضة, يمكنك من الصفحة الشخصيه الخاصة
                   بالمريض او المريضة إضافه زيارات و تخشيصات
