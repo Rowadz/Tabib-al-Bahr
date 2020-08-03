@@ -8,8 +8,9 @@ import {
   Form,
   FormGroup,
   ControlLabel,
-  HelpBlock,
+  Whisper,
   DatePicker,
+  Popover,
   Button,
   Modal,
   Panel,
@@ -19,7 +20,7 @@ import {
   Timeline,
   Alert,
 } from 'rsuite'
-
+import { v4 } from 'uuid'
 import FroalaEditor from 'react-froala-wysiwyg'
 
 import moment from 'moment'
@@ -32,6 +33,12 @@ export default function PatientProfile() {
     openModal: false,
     diagDate: undefined,
     txt: '',
+    loading: false,
+    globalLoading: false,
+    edit: false,
+    editTxt: '',
+    editDiagDate: undefined,
+    toEditUuid: '',
   })
 
   const { id } = useParams()
@@ -58,45 +65,124 @@ export default function PatientProfile() {
       +moment(a.toDate()).format('X') - +moment(b.toDate()).format('X')
   )
 
-  const toggle = () => setState({ ...state, openModal: !state.openModal })
+  const toggle = () =>
+    setState({
+      ...state,
+      openModal: !state.openModal,
+      edit: false,
+      editTxt: '',
+      editDiagDate: undefined,
+      diagDate: undefined,
+      txt: '',
+    })
   const addDiag = async () => {
+    setState({ ...state, loading: true })
     const newData = {
-      txt: state.txt.trim(),
-      diagDate: state.diagDate,
+      txt: state.edit ? state.editTxt : state.txt.trim(),
+      diagDate: state.edit ? state.editDiagDate : state.diagDate,
+      uuid: state.edit ? state.toEditUuid : v4(),
     }
+
     let oldDiagnoses = ((await patient.get()).data() as any).diagnoses
     if (!oldDiagnoses) oldDiagnoses = []
-
+    if (state.edit) {
+      oldDiagnoses = oldDiagnoses.filter(
+        ({ uuid }: any) => state.toEditUuid !== uuid
+      )
+    }
     patient
       .update({
         diagnoses: [...oldDiagnoses, newData],
       })
       .then(() => {
-        toggle()
-        Alert.success(`تمت إضافة زياره لــ ${patient_name}`)
+        if (state.edit) {
+          Alert.success(`تم التعـــديــل`)
+        } else {
+          Alert.success(`تمت إضافة زياره لــ ${patient_name}`)
+        }
+        setState({ ...state, loading: false, openModal: false, edit: true })
+      })
+      .catch(() => {
+        Alert.error(`حدث خطأ من السيرفر الرجاء المحاوله بعد ٣٠ ثانيه`)
+        setState({ ...state, loading: false, openModal: false, edit: true })
       })
   }
-  const dateChage = (
-    value: Date,
-    event: React.SyntheticEvent<HTMLElement, Event>
-  ) => {
-    setState({ ...state, diagDate: value as any })
+  const dateChage = (value: Date) => {
+    if (state.edit) {
+      setState({ ...state, editDiagDate: value as any })
+    } else {
+      setState({ ...state, diagDate: value as any })
+    }
   }
   const txtChange = (txt: any) => {
-    setState({ ...state, txt })
+    if (state.edit) {
+      setState({ ...state, editTxt: txt })
+    } else {
+      setState({ ...state, txt })
+    }
   }
+
+  const deleteDiagnose = async (uuid: string) => {
+    setState({ ...state, globalLoading: true })
+    const oldDiagnoses = ((await patient.get()).data() as any).diagnoses
+    patient
+      .update({
+        diagnoses: oldDiagnoses.filter(({ uuid: id }: any) => uuid !== id),
+      })
+      .then(() => {
+        Alert.success(`تم الحذف`)
+        setState({ ...state, globalLoading: false })
+      })
+      .catch(() => {
+        Alert.error(`حدث خطأ من السيرفر الرجاء المحاوله بعد ٣٠ ثانيه`)
+        setState({ ...state, globalLoading: false })
+      })
+  }
+
+  const editDiagnose = (uuid: string) => {
+    setState({ ...state, edit: true, globalLoading: true, toEditUuid: uuid })
+    Alert.info('جاري التحميل, الرجاء الإنتظار')
+    initEdit(uuid)
+  }
+
+  const initEdit = async (uuid: string) => {
+    const oldDiagnoses = ((await patient.get()).data() as any).diagnoses
+    const diagnose = oldDiagnoses.find(({ uuid: id }: any) => uuid === id)
+
+    setState({
+      ...state,
+      openModal: true,
+      globalLoading: false,
+      edit: true,
+      toEditUuid: uuid,
+      editTxt: diagnose.txt,
+      editDiagDate: diagnose.diagDate.toDate(),
+    })
+  }
+
+  const delSpeaker = (
+    <Popover title="ملاحــظه !">
+      <p>إضــغــط مرتين بسرعه للحــذف</p>
+    </Popover>
+  )
 
   return (
     <Grid style={{ padding: 70 }}>
       <Modal full show={state.openModal} onHide={toggle}>
         <Header>
-          <Title>إضافة زيــارة أو تشــخيــص لـــ ` {patient_name} `</Title>
+          {state.edit ? (
+            'تعديل زياره'
+          ) : (
+            <Title>إضافة زيــارة أو تشــخيــص لـــ ` {patient_name} `</Title>
+          )}
         </Header>
         <Body>
           <Form>
             <FormGroup>
               <ControlLabel>تاريخ الزيـارة</ControlLabel>
               <DatePicker
+                value={state.edit ? (state.editDiagDate as any) : undefined}
+                disabled={state.globalLoading}
                 onChange={dateChage}
                 cleanable={false}
                 locale={{
@@ -122,6 +208,7 @@ export default function PatientProfile() {
               <ControlLabel>التشـــيخــص</ControlLabel>
               <FroalaEditor
                 tag="textarea"
+                model={state.edit ? state.editTxt : state.txt}
                 config={{
                   toolbarButtons: [
                     'bold',
@@ -147,13 +234,28 @@ export default function PatientProfile() {
           </Form>
         </Body>
         <Footer>
-          <Button
-            appearance="primary"
-            onClick={addDiag}
-            disabled={!(state.txt && state.diagDate)}
-          >
-            إضافة
-          </Button>
+          {state.edit ? (
+            <Button
+              appearance="primary"
+              color="orange"
+              onClick={addDiag}
+              disabled={
+                !(state.editTxt && state.editDiagDate) || state.globalLoading
+              }
+              loading={state.loading}
+            >
+              تعديــل
+            </Button>
+          ) : (
+            <Button
+              appearance="primary"
+              onClick={addDiag}
+              disabled={!(state.txt && state.diagDate)}
+              loading={state.loading}
+            >
+              إضافة
+            </Button>
+          )}
           <Button onClick={toggle} appearance="subtle">
             إغلاق
           </Button>
@@ -205,25 +307,34 @@ export default function PatientProfile() {
         </Col>
         <Col xs={24} sm={24} md={24}>
           <Timeline>
-            {toDisplayDiagnoses.map(({ diagDate, txt }: any, i: number) => (
-              <Timeline.Item key={i}>
-                {moment(diagDate.toDate()).format('MM/DD/YYYY')}
-                <span dangerouslySetInnerHTML={{ __html: txt }}></span>
-                <IconButton
-                  icon={<Icon icon="trash" />}
-                  color="red"
-                  circle
-                  size="xs"
-                />
-                <IconButton
-                  style={{ margin: 10 }}
-                  icon={<Icon icon="edit" />}
-                  color="cyan"
-                  circle
-                  size="xs"
-                />
-              </Timeline.Item>
-            ))}
+            {toDisplayDiagnoses.map(
+              ({ diagDate, txt, uuid }: any, i: number) => (
+                <Timeline.Item key={i}>
+                  {moment(diagDate.toDate()).format('MM/DD/YYYY')}
+                  <span dangerouslySetInnerHTML={{ __html: txt }}></span>
+                  <Whisper placement="top" trigger="click" speaker={delSpeaker}>
+                    <IconButton
+                      icon={<Icon icon="trash" />}
+                      color="red"
+                      circle
+                      size="xs"
+                      loading={state.globalLoading}
+                      onDoubleClick={() => deleteDiagnose(uuid)}
+                    />
+                  </Whisper>
+
+                  <IconButton
+                    style={{ margin: 10 }}
+                    icon={<Icon icon="edit" />}
+                    color="cyan"
+                    loading={state.globalLoading}
+                    circle
+                    size="xs"
+                    onClick={() => editDiagnose(uuid)}
+                  />
+                </Timeline.Item>
+              )
+            )}
           </Timeline>
         </Col>
       </Row>
