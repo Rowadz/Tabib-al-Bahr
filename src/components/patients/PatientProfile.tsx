@@ -74,7 +74,7 @@ export default function PatientProfile() {
 
   return (
     <Grid style={{ padding: 70 }}>
-      <Modal show={state.openModal} onHide={toggle}>
+      <Modal full show={state.openModal} onHide={toggle}>
         <Header>
           <Title>إضافة زيــارة أو تشــخيــص لـــ ` {patient_name} `</Title>
         </Header>
