@@ -2,6 +2,7 @@ import React from 'react'
 import './App.scss'
 import { HashRouter as Router, Route } from 'react-router-dom'
 import 'rsuite/dist/styles/rsuite-default-rtl.css'
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import {
   AppNav,
   Home,
