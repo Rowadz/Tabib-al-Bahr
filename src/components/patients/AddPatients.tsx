@@ -12,6 +12,7 @@ import {
   Button,
   Radio,
   RadioGroup,
+  DatePicker,
 } from 'rsuite'
 import { Redirect } from 'react-router-dom'
 import { useFirestore } from 'reactfire'
@@ -27,6 +28,7 @@ export default function AddPatients() {
     loading: false,
     redirect: false,
     userId: '',
+    birth_of_date: '',
   })
 
   const patients = useFirestore().collection('patients')
@@ -37,6 +39,13 @@ export default function AddPatients() {
     if (typeof formValue === 'string')
       setState({ ...state, patient_extra_info: formValue })
     else setState({ ...state, ...formValue })
+  }
+
+  const dateChage = (
+    value: Date,
+    event: React.SyntheticEvent<HTMLElement, Event>
+  ) => {
+    setState({ ...state, birth_of_date: value as any })
   }
 
   const submit = () => {
@@ -66,6 +75,36 @@ export default function AddPatients() {
                 <Radio value="ذكـــر">ذكـــر</Radio>
                 <Radio value="أنثـــى">أنثـــى</Radio>
               </FormControl>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>الرقم الوطني</ControlLabel>
+              <FormControl name="patient_ID" />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>تاريخ الميلاد</ControlLabel>
+              <DatePicker
+                onChange={dateChage}
+                cleanable={false}
+                locale={{
+                  sunday: 'Su',
+                  monday: 'Mo',
+                  tuesday: 'Tu',
+                  wednesday: 'We',
+                  thursday: 'Th',
+                  friday: 'Fr',
+                  saturday: 'Sa',
+                  ok: 'إضافة التاريخ',
+                  today: 'اليوم',
+                  yesterday: 'البارحة',
+                  hours: 'Hours',
+                  minutes: 'Minutes',
+                  seconds: 'Seconds',
+                }}
+                name="birth_of_date"
+                style={{ width: 280 }}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>معلومات إضافــية</ControlLabel>

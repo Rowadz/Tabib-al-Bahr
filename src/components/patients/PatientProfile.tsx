@@ -17,6 +17,7 @@ import {
   Icon,
   Divider,
   Timeline,
+  Alert,
 } from 'rsuite'
 
 import FroalaEditor from 'react-froala-wysiwyg'
@@ -41,26 +42,39 @@ export default function PatientProfile() {
     patient_sex,
     patient_extra_info,
     diagnoses,
+    patient_ID,
+    birth_of_date,
   } = useFirestoreDocData(patient)
+
+  const age = !birth_of_date
+    ? '--'
+    : moment.duration(moment().diff(moment(birth_of_date.toDate(), 'MM-YYYY')))
+
+  const years = (age as moment.Duration).years()
+  const months = (age as moment.Duration).months()
+
   const toDisplayDiagnoses = (diagnoses || []).sort(
     ({ diagDate: a }: any, { diagDate: b }: any) =>
       +moment(a.toDate()).format('X') - +moment(b.toDate()).format('X')
   )
 
-  console.log(toDisplayDiagnoses)
-
   const toggle = () => setState({ ...state, openModal: !state.openModal })
   const addDiag = async () => {
     const newData = {
-      txt: state.txt,
+      txt: state.txt.trim(),
       diagDate: state.diagDate,
     }
     let oldDiagnoses = ((await patient.get()).data() as any).diagnoses
     if (!oldDiagnoses) oldDiagnoses = []
 
-    patient.update({
-      diagnoses: [...oldDiagnoses, newData],
-    })
+    patient
+      .update({
+        diagnoses: [...oldDiagnoses, newData],
+      })
+      .then(() => {
+        toggle()
+        Alert.success(`تمت إضافة زياره لــ ${patient_name}`)
+      })
   }
   const dateChage = (
     value: Date,
@@ -103,7 +117,6 @@ export default function PatientProfile() {
                 name="coming_date"
                 style={{ width: '100%' }}
               />
-              <HelpBlock tooltip>هذه العلومه إختياريه</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>التشـــيخــص</ControlLabel>
@@ -157,15 +170,25 @@ export default function PatientProfile() {
             <Panel>
               <h4>الاسم: {patient_name}</h4>
               <h4>الجنس: {patient_sex}</h4>
-              <h5>
-                معلومات اضافيه:
-                <Divider />
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: patient_extra_info ? patient_extra_info : 'لا يوجد',
-                  }}
-                ></span>
-              </h5>
+              <h4>الرقم الوطني: {patient_ID}</h4>
+              <h4>
+                تاريخ الميلاد:{' '}
+                {birth_of_date
+                  ? moment(birth_of_date.toDate()).format('MM/DD/YYYY')
+                  : '--'}
+              </h4>
+              <h4>
+                العمــر: {years} سنه
+                {' و '}
+                {months} اشهر
+              </h4>
+              <Divider />
+              <h5>معلومات اضافيه:</h5>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: patient_extra_info ? patient_extra_info : 'لا يوجد',
+                }}
+              ></span>
             </Panel>
           </Panel>
         </Col>
