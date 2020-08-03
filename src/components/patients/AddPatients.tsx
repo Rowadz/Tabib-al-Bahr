@@ -12,6 +12,7 @@ import {
   Button,
   Radio,
   RadioGroup,
+  SelectPicker,
   DatePicker,
 } from 'rsuite'
 import { Redirect } from 'react-router-dom'
@@ -21,6 +22,60 @@ import FroalaEditor from 'react-froala-wysiwyg'
 import { Alert } from 'rsuite'
 
 export default function AddPatients() {
+  const city = [
+    {
+      label: 'عمان',
+      value: 'عمان',
+    },
+    {
+      label: 'الزرقاء',
+      value: 'الزرقاء',
+    },
+    {
+      label: 'معان',
+      value: 'معان',
+    },
+    {
+      label: 'المفرق',
+      value: 'المفرق',
+    },
+    {
+      label: 'العقبة',
+      value: 'العقبة',
+    },
+    {
+      label: 'اربد',
+      value: 'اربد',
+    },
+    {
+      label: 'الطفيلة',
+      value: 'الطفيلة',
+    },
+    {
+      label: 'الكرك',
+      value: 'الكرك',
+    },
+    {
+      label: 'البلقاء',
+      value: 'البلقاء',
+    },
+    {
+      label: 'جرش',
+      value: 'جرش',
+    },
+    {
+      label: 'عجلون',
+      value: 'عجلون',
+    },
+    {
+      label: 'مادبا',
+      value: 'مادبا',
+    },
+    {
+      label: 'المفرق',
+      value: 'المفرق',
+    },
+  ]
   const [state, setState] = useState({
     patient_name: '',
     patient_sex: '',
@@ -29,11 +84,18 @@ export default function AddPatients() {
     redirect: false,
     userId: '',
     birth_of_date: '',
+    patient_city: '',
+    patient_city_extra: '',
+    patient_phone: '',
+    patient_disease_history: '',
+    patient_medicine_history: '',
+    patient_surgery_history: '',
+    patient_educational_lvl: '',
+    patient_family_history: '',
   })
 
   const patients = useFirestore().collection('patients')
 
-  console.log(state)
   const { patient_sex, patient_name } = state
   const changeVal = (formValue: Record<string, any>) => {
     if (typeof formValue === 'string')
@@ -41,10 +103,7 @@ export default function AddPatients() {
     else setState({ ...state, ...formValue })
   }
 
-  const dateChage = (
-    value: Date,
-    event: React.SyntheticEvent<HTMLElement, Event>
-  ) => {
+  const dateChage = (value: Date) => {
     setState({ ...state, birth_of_date: value as any })
   }
 
@@ -56,6 +115,7 @@ export default function AddPatients() {
       setState({ ...state, loading: false, redirect: true, userId: user.id })
     })
   }
+
   const page = state.redirect ? (
     <Redirect to={`/display/patients/${state.userId}`} />
   ) : (
@@ -75,6 +135,29 @@ export default function AddPatients() {
                 <Radio value="ذكـــر">ذكـــر</Radio>
                 <Radio value="أنثـــى">أنثـــى</Radio>
               </FormControl>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>السكن</ControlLabel>
+              <SelectPicker
+                data={city}
+                style={{ width: 280 }}
+                placeholder="السكن"
+                onChange={(patient_city) =>
+                  setState({ ...state, patient_city })
+                }
+                name="patient_city"
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>معلومات إضافيه عن السكن</ControlLabel>
+              <FormControl name="patient_city_extra" />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>رقم الهاتف</ControlLabel>
+              <FormControl name="patient_phone" />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
               <ControlLabel>الرقم الوطني</ControlLabel>
@@ -103,6 +186,51 @@ export default function AddPatients() {
                 }}
                 name="birth_of_date"
                 style={{ width: 280 }}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>السيره المرضية</ControlLabel>
+              <FormControl
+                name="patient_disease_history"
+                rows={5}
+                componentClass="textarea"
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>تاريخ الأدويه</ControlLabel>
+              <FormControl
+                name="patient_medicine_history"
+                rows={5}
+                componentClass="textarea"
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>تاريخ العمليات</ControlLabel>
+              <FormControl
+                name="patient_surgery_history"
+                rows={5}
+                componentClass="textarea"
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>المستوى التعليمي</ControlLabel>
+              <FormControl
+                name="patient_educational_lvl"
+                rows={5}
+                componentClass="textarea"
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>التاريخ المرضي للعائلة</ControlLabel>
+              <FormControl
+                name="patient_family_history"
+                rows={5}
+                componentClass="textarea"
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>

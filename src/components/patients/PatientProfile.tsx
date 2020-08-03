@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useFirestoreDocData, useFirestore } from 'reactfire'
+import { useFirestoreDocData, useFirestore, checkOptions } from 'reactfire'
 import {
   Grid,
   Row,
@@ -8,11 +8,15 @@ import {
   Form,
   FormGroup,
   ControlLabel,
+  HelpBlock,
   Whisper,
+  FormControl,
   DatePicker,
+  PanelGroup,
   Popover,
   Button,
   Modal,
+  List,
   Panel,
   IconButton,
   Icon,
@@ -39,6 +43,18 @@ export default function PatientProfile() {
     editTxt: '',
     editDiagDate: undefined,
     toEditUuid: '',
+    complain: '',
+    complain_edit: '',
+    diagnosis_txt: '',
+    diagnosis_txt_edit: '',
+    clinical_examination: '',
+    clinical_examination_edit: '',
+    laboratories: '',
+    laboratories_edit: '',
+    x_rays: '',
+    x_rays_edit: '',
+    treatment: '',
+    treatment_edit: '',
   })
 
   const { id } = useParams()
@@ -51,19 +67,50 @@ export default function PatientProfile() {
     diagnoses,
     patient_ID,
     birth_of_date,
+    patient_city,
+    patient_city_extra,
+    patient_phone,
+    patient_disease_history,
+    patient_medicine_history,
+    patient_surgery_history,
+    patient_educational_lvl,
+    patient_family_history,
   } = useFirestoreDocData(patient)
 
   const age = !birth_of_date
     ? '--'
     : moment.duration(moment().diff(moment(birth_of_date.toDate(), 'MM-YYYY')))
 
-  const years = (age as moment.Duration).years()
-  const months = (age as moment.Duration).months()
+  const years = age !== '--' ? (age as moment.Duration).years() : '--'
+  const months = age !== '--' ? (age as moment.Duration).months() : '--'
 
-  const toDisplayDiagnoses = (diagnoses || []).sort(
-    ({ diagDate: a }: any, { diagDate: b }: any) =>
-      +moment(a.toDate()).format('X') - +moment(b.toDate()).format('X')
-  )
+  const toDisplayDiagnoses = (diagnoses || [])
+    .sort(
+      ({ diagDate: a }: any, { diagDate: b }: any) =>
+        +moment(a.toDate()).format('X') - +moment(b.toDate()).format('X')
+    )
+    .map(
+      ({
+        complain,
+        diagnosis_txt,
+        clinical_examination,
+        laboratories,
+        x_rays,
+        treatment,
+        ...reset
+      }: any) => ({
+        complain: complain ? complain : '--',
+        diagnosis_txt: diagnosis_txt ? diagnosis_txt : '--',
+        clinical_examination: clinical_examination
+          ? clinical_examination
+          : '--',
+        laboratories: laboratories ? laboratories : '--',
+        x_rays: x_rays ? x_rays : '--',
+        treatment: treatment ? treatment : '--',
+        ...reset,
+      })
+    )
+  console.log(toDisplayDiagnoses)
 
   const toggle = () =>
     setState({
@@ -81,6 +128,16 @@ export default function PatientProfile() {
       txt: state.edit ? state.editTxt : state.txt.trim(),
       diagDate: state.edit ? state.editDiagDate : state.diagDate,
       uuid: state.edit ? state.toEditUuid : v4(),
+      complain: state.edit ? state.complain_edit : state.complain,
+      diagnosis_txt: state.edit
+        ? state.diagnosis_txt_edit
+        : state.diagnosis_txt,
+      clinical_examination: state.edit
+        ? state.clinical_examination_edit
+        : state.clinical_examination,
+      laboratories: state.edit ? state.laboratories_edit : state.laboratories,
+      x_rays: state.edit ? state.x_rays_edit : state.x_rays,
+      treatment: state.edit ? state.treatment_edit : state.treatment,
     }
 
     let oldDiagnoses = ((await patient.get()).data() as any).diagnoses
@@ -149,6 +206,7 @@ export default function PatientProfile() {
     const oldDiagnoses = ((await patient.get()).data() as any).diagnoses
     const diagnose = oldDiagnoses.find(({ uuid: id }: any) => uuid === id)
 
+    console.log(diagnose)
     setState({
       ...state,
       openModal: true,
@@ -157,6 +215,12 @@ export default function PatientProfile() {
       toEditUuid: uuid,
       editTxt: diagnose.txt,
       editDiagDate: diagnose.diagDate.toDate(),
+      complain_edit: diagnose.complain,
+      diagnosis_txt_edit: diagnose.diagnosis_txt,
+      clinical_examination_edit: diagnose.clinical_examination,
+      laboratories_edit: diagnose.laboratories,
+      x_rays_edit: diagnose.x_rays,
+      treatment_edit: diagnose.treatment,
     })
   }
 
@@ -166,6 +230,7 @@ export default function PatientProfile() {
     </Popover>
   )
 
+  console.log(state)
   return (
     <Grid style={{ padding: 70 }}>
       <Modal full show={state.openModal} onHide={toggle}>
@@ -177,7 +242,7 @@ export default function PatientProfile() {
           )}
         </Header>
         <Body>
-          <Form>
+          <Form onChange={(s) => setState({ ...state, ...s })}>
             <FormGroup>
               <ControlLabel>تاريخ الزيـارة</ControlLabel>
               <DatePicker
@@ -201,11 +266,95 @@ export default function PatientProfile() {
                   seconds: 'Seconds',
                 }}
                 name="coming_date"
-                style={{ width: '100%' }}
+                style={{ width: 280 }}
               />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>التشـــيخــص</ControlLabel>
+              <ControlLabel>الشكوى</ControlLabel>
+              <FormControl
+                name="complain"
+                rows={5}
+                componentClass="textarea"
+                onChange={(complain_edit) =>
+                  setState({ ...state, complain_edit })
+                }
+                value={state.edit ? state.complain_edit : state.complain}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>التشخيص</ControlLabel>
+              <FormControl
+                name="diagnosis_txt"
+                rows={5}
+                componentClass="textarea"
+                onChange={(diagnosis_txt_edit) =>
+                  setState({ ...state, diagnosis_txt_edit })
+                }
+                value={
+                  state.edit ? state.diagnosis_txt_edit : state.diagnosis_txt
+                }
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>الفحص السريري</ControlLabel>
+              <FormControl
+                name="clinical_examination"
+                rows={5}
+                componentClass="textarea"
+                onChange={(clinical_examination_edit) =>
+                  setState({ ...state, clinical_examination_edit })
+                }
+                value={
+                  state.edit
+                    ? state.clinical_examination_edit
+                    : state.clinical_examination
+                }
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>المختبرات</ControlLabel>
+              <FormControl
+                name="laboratories"
+                rows={5}
+                componentClass="textarea"
+                onChange={(laboratories_edit) =>
+                  setState({ ...state, laboratories_edit })
+                }
+                value={
+                  state.edit ? state.laboratories_edit : state.laboratories
+                }
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>الأشعه</ControlLabel>
+              <FormControl
+                name="x_rays"
+                rows={5}
+                componentClass="textarea"
+                onChange={(x_rays_edit) => setState({ ...state, x_rays_edit })}
+                value={state.edit ? state.x_rays_edit : state.x_rays}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>العلاج</ControlLabel>
+              <FormControl
+                name="treatment"
+                rows={5}
+                componentClass="textarea"
+                onChange={(treatment_edit) =>
+                  setState({ ...state, treatment_edit })
+                }
+                value={state.edit ? state.treatment_edit : state.x_rays}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>معلومات إضافيه</ControlLabel>
               <FroalaEditor
                 tag="textarea"
                 model={state.edit ? state.editTxt : state.txt}
@@ -239,9 +388,7 @@ export default function PatientProfile() {
               appearance="primary"
               color="orange"
               onClick={addDiag}
-              disabled={
-                !(state.editTxt && state.editDiagDate) || state.globalLoading
-              }
+              disabled={!state.editDiagDate || state.globalLoading}
               loading={state.loading}
             >
               تعديــل
@@ -250,7 +397,7 @@ export default function PatientProfile() {
             <Button
               appearance="primary"
               onClick={addDiag}
-              disabled={!(state.txt && state.diagDate)}
+              disabled={!state.diagDate}
               loading={state.loading}
             >
               إضافة
@@ -272,7 +419,7 @@ export default function PatientProfile() {
             <Panel>
               <h4>الاسم: {patient_name}</h4>
               <h4>الجنس: {patient_sex}</h4>
-              <h4>الرقم الوطني: {patient_ID}</h4>
+              <h4>الرقم الوطني: {patient_ID ? patient_ID : '--'}</h4>
               <h4>
                 تاريخ الميلاد:{' '}
                 {birth_of_date
@@ -285,12 +432,39 @@ export default function PatientProfile() {
                 {months} اشهر
               </h4>
               <Divider />
-              <h5>معلومات اضافيه:</h5>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: patient_extra_info ? patient_extra_info : 'لا يوجد',
-                }}
-              ></span>
+              <PanelGroup>
+                <Panel header=" مدينه المريض:">
+                  <h6>{patient_city ? patient_city : '--'}</h6>
+                </Panel>
+                <Panel header="معلومات إضافية عن السكن:">
+                  {patient_city_extra ? patient_city_extra : '--'}
+                </Panel>
+                <Panel header="رقم الهاتف:">
+                  {patient_phone ? patient_phone : '--'}
+                </Panel>
+                <Panel header="السيرة المرضية:">
+                  {patient_disease_history ? patient_disease_history : '--'}
+                </Panel>
+                <Panel header="تاريخ الأدويه:">
+                  {patient_medicine_history ? patient_medicine_history : '--'}
+                </Panel>
+                <Panel header="تاريخ العمليات:">
+                  {patient_surgery_history ? patient_surgery_history : '--'}
+                </Panel>
+                <Panel header="المستوى التعليمي:">
+                  {patient_educational_lvl ? patient_educational_lvl : '--'}
+                </Panel>
+                <Panel header="التاريخ المرضي للعائله:">
+                  {patient_family_history ? patient_family_history : '--'}
+                </Panel>
+                <Panel header="معلومات اضافيه:">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: patient_extra_info ? patient_extra_info : '--',
+                    }}
+                  ></span>
+                </Panel>
+              </PanelGroup>
             </Panel>
           </Panel>
         </Col>
@@ -308,9 +482,36 @@ export default function PatientProfile() {
         <Col xs={24} sm={24} md={24}>
           <Timeline>
             {toDisplayDiagnoses.map(
-              ({ diagDate, txt, uuid }: any, i: number) => (
+              (
+                {
+                  diagDate,
+                  txt,
+                  uuid,
+                  complain,
+                  diagnosis_txt,
+                  clinical_examination,
+                  laboratories,
+                  x_rays,
+                  treatment,
+                }: any,
+                i: number
+              ) => (
                 <Timeline.Item key={i}>
                   {moment(diagDate.toDate()).format('MM/DD/YYYY')}
+                  <br />
+                  <Icon icon="stethoscope" /> الشكوى: {complain}
+                  <br />
+                  <Icon icon="heartbeat" /> التشخيص: {diagnosis_txt}
+                  <br />
+                  <Icon icon="user-md" /> الفحص السريري: {clinical_examination}
+                  <br />
+                  <Icon icon="hospital-o" /> المختبرات: {laboratories}
+                  <br />
+                  <Icon icon="magic" /> المختبرات: {x_rays}
+                  <br />
+                  <Icon icon="heart" /> العلاج: {treatment}
+                  <br />
+                  <Icon icon="plus-square" /> معلومات إضافية:{' '}
                   <span dangerouslySetInnerHTML={{ __html: txt }}></span>
                   <Whisper placement="top" trigger="click" speaker={delSpeaker}>
                     <IconButton
@@ -322,7 +523,6 @@ export default function PatientProfile() {
                       onDoubleClick={() => deleteDiagnose(uuid)}
                     />
                   </Whisper>
-
                   <IconButton
                     style={{ margin: 10 }}
                     icon={<Icon icon="edit" />}
