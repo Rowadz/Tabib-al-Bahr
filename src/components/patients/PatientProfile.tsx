@@ -533,7 +533,7 @@ export default function PatientProfile() {
                   <br />
                   <Icon icon="hospital-o" /> المختبرات: {laboratories}
                   <br />
-                  <Icon icon="magic" /> المختبرات: {x_rays}
+                  <Icon icon="magic" /> الاشعه: {x_rays}
                   <br />
                   <Icon icon="heart" /> العلاج: {treatment}
                   <br />

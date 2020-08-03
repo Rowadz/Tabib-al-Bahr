@@ -19,7 +19,7 @@ export default function Home() {
           <Panel bodyFill style={{ display: 'inline-block' }}>
             <img src={doctor2} alt="doctor2" width="100%" height="auto" />
             <Panel>
-              <h1>يمكنك إضافـة معلومات عن الأطباء و المرضى و رؤية إحصائيـات</h1>
+              <h1>يمكنك إضافـة معلومات عن المرضى و رؤية إحصائيـات</h1>
             </Panel>
           </Panel>
         </Col>
