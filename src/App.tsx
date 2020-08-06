@@ -11,6 +11,7 @@ import {
   Patients,
   AddPatients,
   PatientProfile,
+  Analytics,
 } from './components'
 import { SuspenseWithPerf } from 'reactfire'
 
@@ -35,7 +36,9 @@ function App() {
           <PatientProfile />
         </Route>
         <Route path="/doctors"></Route>
-        <Route path="/analytics"></Route>
+        <Route path="/analytics">
+          <Analytics />
+        </Route>
       </Router>
     </SuspenseWithPerf>
   )
