@@ -504,6 +504,7 @@ export default function PatientProfile() {
               <h4>الاسم: {patient_name}</h4>
               <h4>الجنس: {patient_sex}</h4>
               <h4>الرقم الوطني: {patient_ID ? patient_ID : '--'}</h4>
+              <h4>رقم الهاتف: {patient_phone ? patient_phone : '--'}</h4>
               <h4>
                 تاريخ الميلاد:{' '}
                 {birth_of_date
@@ -522,9 +523,6 @@ export default function PatientProfile() {
                 </Panel>
                 <Panel header="معلومات إضافية عن السكن:">
                   {patient_city_extra ? patient_city_extra : '--'}
-                </Panel>
-                <Panel header="رقم الهاتف:">
-                  {patient_phone ? patient_phone : '--'}
                 </Panel>
                 <Panel header="السيرة المرضية:">
                   {patient_disease_history ? patient_disease_history : '--'}
