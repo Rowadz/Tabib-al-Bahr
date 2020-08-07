@@ -55,6 +55,12 @@ export default function PatientProfile() {
     treatment: '',
     treatment_edit: '',
     redirectToEdit: false,
+    temperature: '',
+    temperature_edit: '',
+    pressure: '',
+    pressure_edit: '',
+    pulse: '',
+    pulse_edit: '',
   })
 
   const { id } = useParams()
@@ -97,6 +103,9 @@ export default function PatientProfile() {
         laboratories,
         x_rays,
         treatment,
+        temperature,
+        pressure,
+        pulse,
         ...reset
       }: any) => ({
         complain: complain ? complain : '--',
@@ -107,6 +116,9 @@ export default function PatientProfile() {
         laboratories: laboratories ? laboratories : '--',
         x_rays: x_rays ? x_rays : '--',
         treatment: treatment ? treatment : '--',
+        temperature: temperature ? temperature : '--',
+        pressure: pressure ? pressure : '--',
+        pulse: pulse ? pulse : '--',
         ...reset,
       })
     )
@@ -137,6 +149,9 @@ export default function PatientProfile() {
       laboratories: state.edit ? state.laboratories_edit : state.laboratories,
       x_rays: state.edit ? state.x_rays_edit : state.x_rays,
       treatment: state.edit ? state.treatment_edit : state.treatment,
+      temperature: state.edit ? state.temperature_edit : state.temperature,
+      pressure: state.edit ? state.pressure_edit : state.pressure,
+      pulse: state.edit ? state.pulse_edit : state.pulse,
     }
 
     let oldDiagnoses = ((await patient.get()).data() as any).diagnoses
@@ -298,6 +313,57 @@ export default function PatientProfile() {
                 value={
                   state.edit ? state.diagnosis_txt_edit : state.diagnosis_txt
                 }
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>درجة الحرارة</ControlLabel>
+              <FormControl
+                name="temperature"
+                rows={5}
+                componentClass="textarea"
+                onChange={(temperature_edit) =>
+                  setState({
+                    ...state,
+                    temperature_edit,
+                    temperature: temperature_edit,
+                  })
+                }
+                value={state.edit ? state.temperature_edit : state.temperature}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>الضغط</ControlLabel>
+              <FormControl
+                name="pressure"
+                rows={5}
+                componentClass="textarea"
+                onChange={(pressure_edit) =>
+                  setState({
+                    ...state,
+                    pressure_edit,
+                    pressure: pressure_edit,
+                  })
+                }
+                value={state.edit ? state.pressure_edit : state.pressure}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>النبض</ControlLabel>
+              <FormControl
+                name="pulse"
+                rows={5}
+                componentClass="textarea"
+                onChange={(pulse_edit) =>
+                  setState({
+                    ...state,
+                    pulse_edit,
+                    pulse: pulse_edit,
+                  })
+                }
+                value={state.edit ? state.pulse_edit : state.pulse}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -519,6 +585,9 @@ export default function PatientProfile() {
                   laboratories,
                   x_rays,
                   treatment,
+                  temperature,
+                  pressure,
+                  pulse,
                 }: any,
                 i: number
               ) => (
@@ -527,7 +596,13 @@ export default function PatientProfile() {
                   <br />
                   <Icon icon="stethoscope" /> الشكوى: {complain}
                   <br />
-                  <Icon icon="heartbeat" /> التشخيص: {diagnosis_txt}
+                  <Icon icon="newspaper-o" /> التشخيص: {diagnosis_txt}
+                  <br />
+                  <Icon icon="thermometer" /> درجة الحرارة: {temperature}
+                  <br />
+                  <Icon icon="asterisk" /> الضغط: {pressure}
+                  <br />
+                  <Icon icon="heartbeat" /> النبض: {pulse}
                   <br />
                   <Icon icon="user-md" /> الفحص السريري: {clinical_examination}
                   <br />
