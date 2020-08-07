@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, Redirect } from 'react-router-dom'
 import { useFirestoreDocData, useFirestore } from 'reactfire'
+import { useHistory } from 'react-router-dom'
 import {
   Grid,
   Row,
@@ -26,12 +27,14 @@ import {
 } from 'rsuite'
 import { v4 } from 'uuid'
 import FroalaEditor from 'react-froala-wysiwyg'
+import * as firebase from 'firebase'
 import moment from 'moment'
 // import 'moment/locale/ar'
 // moment.locale('ar')
 const { Header, Title, Body, Footer } = Modal
 
 export default function PatientProfile() {
+  const history = useHistory()
   const [state, setState] = useState({
     openModal: false,
     diagDate: undefined,
@@ -65,7 +68,12 @@ export default function PatientProfile() {
 
   const { id } = useParams()
   const patient = useFirestore().collection('patients').doc(id)
-
+  const delUser = () => {
+    const db = firebase.firestore()
+    db.collection('patients').doc(id).delete()
+    history.push('/patients')
+    Alert.success('تمت العمليه بنجاح')
+  }
   const {
     patient_name,
     patient_sex,
@@ -240,6 +248,13 @@ export default function PatientProfile() {
   const delSpeaker = (
     <Popover title="ملاحــظه !">
       <p>إضــغــط مرتين بسرعه للحــذف</p>
+    </Popover>
+  )
+
+  const delSpeaker2 = (
+    <Popover title="ملاحــظه !">
+      <p>إضــغــط مرتين بسرعه للحــذف</p>
+      <p>لا يمكن أسترجاع المريض إذا تم حذفة</p>
     </Popover>
   )
 
@@ -565,6 +580,16 @@ export default function PatientProfile() {
           >
             تعديل بيانات المريض
           </IconButton>
+          <Whisper placement="top" trigger="click" speaker={delSpeaker2}>
+            <IconButton
+              style={{ marginRight: 10 }}
+              icon={<Icon icon="ban" />}
+              color="red"
+              onDoubleClick={delUser}
+            >
+              حذف المريض, بالكامل
+            </IconButton>
+          </Whisper>
         </Col>
         <Col xs={24} sm={24} md={24}>
           <Divider>الزيــارات و التخشــيصــات</Divider>
