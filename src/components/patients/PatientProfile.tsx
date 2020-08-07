@@ -79,7 +79,6 @@ export default function PatientProfile() {
     patient_sex,
     patient_extra_info,
     diagnoses,
-    patient_ID,
     birth_of_date,
     patient_city,
     patient_city_extra,
@@ -87,8 +86,7 @@ export default function PatientProfile() {
     patient_disease_history,
     patient_medicine_history,
     patient_surgery_history,
-    patient_educational_lvl,
-    patient_family_history,
+    patient_medicines_that_cause_allergies,
   } = useFirestoreDocData(patient)
 
   const age = !birth_of_date
@@ -518,7 +516,6 @@ export default function PatientProfile() {
             <Panel>
               <h4>الاسم: {patient_name}</h4>
               <h4>الجنس: {patient_sex}</h4>
-              <h4>الرقم الوطني: {patient_ID ? patient_ID : '--'}</h4>
               <h4>رقم الهاتف: {patient_phone ? patient_phone : '--'}</h4>
               <h4>
                 تاريخ الميلاد:{' '}
@@ -539,20 +536,19 @@ export default function PatientProfile() {
                 <Panel header="معلومات إضافية عن السكن:">
                   {patient_city_extra ? patient_city_extra : '--'}
                 </Panel>
-                <Panel header="السيرة المرضية:">
+                <Panel header="الأمراض المزمنة:">
                   {patient_disease_history ? patient_disease_history : '--'}
                 </Panel>
-                <Panel header="تاريخ الأدويه:">
+                <Panel header="ادوية الامراض المزمنة:">
                   {patient_medicine_history ? patient_medicine_history : '--'}
+                </Panel>
+                <Panel header="ادوية تسبب الحساسية:">
+                  {patient_medicines_that_cause_allergies
+                    ? patient_medicines_that_cause_allergies
+                    : '--'}
                 </Panel>
                 <Panel header="تاريخ العمليات:">
                   {patient_surgery_history ? patient_surgery_history : '--'}
-                </Panel>
-                <Panel header="المستوى التعليمي:">
-                  {patient_educational_lvl ? patient_educational_lvl : '--'}
-                </Panel>
-                <Panel header="التاريخ المرضي للعائله:">
-                  {patient_family_history ? patient_family_history : '--'}
                 </Panel>
                 <Panel header="معلومات اضافيه:">
                   <span

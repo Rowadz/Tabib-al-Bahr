@@ -80,7 +80,6 @@ export default function AddPatients() {
     loading: false,
     redirect: false,
     userId: '',
-    patient_ID: '',
     birth_of_date: new Date(),
     patient_city: '',
     patient_city_extra: '',
@@ -88,8 +87,7 @@ export default function AddPatients() {
     patient_disease_history: '',
     patient_medicine_history: '',
     patient_surgery_history: '',
-    patient_educational_lvl: '',
-    patient_family_history: '',
+    patient_medicines_that_cause_allergies: '',
     edit: !!id,
     gloablLoading: !!id,
   })
@@ -105,7 +103,6 @@ export default function AddPatients() {
             patient_name,
             patient_sex,
             patient_extra_info,
-            patient_ID,
             birth_of_date,
             patient_city,
             patient_city_extra,
@@ -113,15 +110,13 @@ export default function AddPatients() {
             patient_disease_history,
             patient_medicine_history,
             patient_surgery_history,
-            patient_educational_lvl,
-            patient_family_history,
+            patient_medicines_that_cause_allergies,
           } = doc.data() as any
           setState({
             ...state,
             patient_name,
             patient_sex,
             patient_extra_info,
-            patient_ID,
             birth_of_date,
             patient_city,
             patient_city_extra,
@@ -129,8 +124,7 @@ export default function AddPatients() {
             patient_disease_history,
             patient_medicine_history,
             patient_surgery_history,
-            patient_educational_lvl,
-            patient_family_history,
+            patient_medicines_that_cause_allergies,
           })
         })
     }
@@ -229,15 +223,6 @@ export default function AddPatients() {
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>الرقم الوطني</ControlLabel>
-              <FormControl
-                name="patient_ID"
-                onChange={(patient_ID) => setState({ ...state, patient_ID })}
-                value={state.patient_ID}
-              />
-              <HelpBlock>معلومة إختيارية</HelpBlock>
-            </FormGroup>
-            <FormGroup>
               <ControlLabel>تاريخ الميلاد</ControlLabel>
               <DatePicker
                 onChange={(birth_of_date: Date) =>
@@ -266,7 +251,7 @@ export default function AddPatients() {
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>السيره المرضية</ControlLabel>
+              <ControlLabel>الأمراض المزمنة</ControlLabel>
               <FormControl
                 name="patient_disease_history"
                 rows={5}
@@ -279,7 +264,7 @@ export default function AddPatients() {
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>تاريخ الأدويه</ControlLabel>
+              <ControlLabel>ادوية الامراض المزمنة</ControlLabel>
               <FormControl
                 name="patient_medicine_history"
                 rows={5}
@@ -288,6 +273,19 @@ export default function AddPatients() {
                   setState({ ...state, patient_medicine_history })
                 }
                 value={state.patient_medicine_history}
+              />
+              <HelpBlock>معلومة إختيارية</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>ادوية تسبب الحساسية</ControlLabel>
+              <FormControl
+                name="patient_medicines_that_cause_allergies"
+                rows={5}
+                componentClass="textarea"
+                onChange={(patient_medicines_that_cause_allergies) =>
+                  setState({ ...state, patient_medicines_that_cause_allergies })
+                }
+                value={state.patient_medicines_that_cause_allergies}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>
@@ -301,32 +299,6 @@ export default function AddPatients() {
                   setState({ ...state, patient_surgery_history })
                 }
                 value={state.patient_surgery_history}
-              />
-              <HelpBlock>معلومة إختيارية</HelpBlock>
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>المستوى التعليمي</ControlLabel>
-              <FormControl
-                name="patient_educational_lvl"
-                rows={5}
-                componentClass="textarea"
-                onChange={(patient_educational_lvl) =>
-                  setState({ ...state, patient_educational_lvl })
-                }
-                value={state.patient_educational_lvl}
-              />
-              <HelpBlock>معلومة إختيارية</HelpBlock>
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>التاريخ المرضي للعائلة</ControlLabel>
-              <FormControl
-                name="patient_family_history"
-                rows={5}
-                componentClass="textarea"
-                onChange={(patient_family_history) =>
-                  setState({ ...state, patient_family_history })
-                }
-                value={state.patient_family_history}
               />
               <HelpBlock>معلومة إختيارية</HelpBlock>
             </FormGroup>

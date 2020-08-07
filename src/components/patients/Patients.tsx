@@ -22,32 +22,20 @@ export default function Patients() {
         field: 'patient_sex',
       },
       {
-        headerName: 'الرقم الوطني',
-        field: 'patient_ID',
-      },
-      {
         headerName: 'المدينة',
         field: 'patient_city',
-      },
-      {
-        headerName: 'معلومات إضافيه عن السكن',
-        field: 'patient_city_extra',
       },
       {
         headerName: 'رقم الهاتف',
         field: 'patient_phone',
       },
       {
+        headerName: 'معلومات إضافيه عن السكن',
+        field: 'patient_city_extra',
+      },
+      {
         headerName: 'السيره المرضية',
         field: 'patient_disease_history',
-      },
-      {
-        headerName: 'المستوى الدراسي',
-        field: 'patient_educational_lvl',
-      },
-      {
-        headerName: 'التاريخ المرضي للعائلة',
-        field: 'patient_family_history',
       },
       {
         headerName: 'تاريخ الأدويه',
