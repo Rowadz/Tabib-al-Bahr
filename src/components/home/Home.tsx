@@ -39,6 +39,7 @@ export default function Home() {
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
+      .then(() => Alert.success('تم الدخول!'))
       .catch(() => Alert.error('كلمه السر او الايميل خطأ '))
   }
   const { isLoggedIn } = state
