@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/Tabib-al-Bahr/precache-manifest.1f18042ffdb554b88d21f4e559c97d20.js"
+  "/Tabib-al-Bahr/precache-manifest.b20870ff173b467f80083ff59e2a278b.js"
 );
 
 self.addEventListener('message', (event) => {
