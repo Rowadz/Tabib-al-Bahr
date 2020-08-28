@@ -50,7 +50,7 @@ export default function Home() {
             <img src={logo} alt="doctor1" width="100%" height="auto" />
           </Panel>
         </Col>
-        {isLoggedIn ? (
+        {!isLoggedIn ? (
           <Col xs={24} sm={24} md={24}>
             <Form onChange={sub}>
               <FormGroup>
