@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "0cb0f1aee9c75bd1425e40c5e54a7694",
+    "revision": "6a6437e8c8ed73c063c9f885ee2fe048",
     "url": "/Tabib-al-Bahr/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Tabib-al-Bahr/static/css/2.0e3801e2.chunk.css"
   },
   {
-    "revision": "1624151c044521cb674a",
+    "revision": "45535bd0cb53673c263c",
     "url": "/Tabib-al-Bahr/static/css/main.f0d5e947.chunk.css"
   },
   {
@@ -56,8 +56,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Tabib-al-Bahr/static/js/9.cc9d65b7.chunk.js"
   },
   {
-    "revision": "1624151c044521cb674a",
-    "url": "/Tabib-al-Bahr/static/js/main.503fd2a1.chunk.js"
+    "revision": "45535bd0cb53673c263c",
+    "url": "/Tabib-al-Bahr/static/js/main.32ed13c4.chunk.js"
   },
   {
     "revision": "f0b885834132343f7d22",
