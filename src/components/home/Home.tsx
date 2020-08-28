@@ -24,11 +24,6 @@ export default function Home() {
     password: '',
     isLoggedIn: false,
   })
-  const user = firebase.auth().currentUser
-
-  if (user) {
-    setState({ ...state, isLoggedIn: true })
-  }
 
   const sub = (a: any) => {
     setState({ ...state, ...a })
