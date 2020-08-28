@@ -69,7 +69,6 @@ export default function Patients() {
         setSate({ ...state, rowData: patients as any })
       })
   }, [])
-  console.log(state.rowData)
   return (
     <Grid fluid style={{ marginTop: 10 }}>
       <Row>
