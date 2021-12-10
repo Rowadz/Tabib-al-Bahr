@@ -45,12 +45,14 @@ export default function Patients() {
         headerName: 'تاريخ العمليات',
         field: 'patient_surgery_history',
       },
-    ],
+    ].reverse(),
     rowData: [],
     defaultColDef: {
       editable: true,
       sortable: true,
       flex: 1,
+      cellClass: 'ag-rtl',
+      headerClass: 'ag-rtl',
       minWidth: 100,
       filter: true,
       resizable: true,
@@ -91,8 +93,8 @@ export default function Patients() {
               columnDefs={state.columnDefs}
               rowData={state.rowData}
               defaultColDef={state.defaultColDef}
-              enableRtl={true}
-            ></AgGridReact>
+              rowClass="ag-rtl"
+            />
           </div>
         </Col>
       </Row>
